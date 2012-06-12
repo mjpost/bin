@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+my $index = shift || 0;
+
+while (my $line = <>) {
+  chomp($line);
+  my @tokens = split(' ',$line);
+  $total += $tokens[$index];
+}
+
+my $mean = 1.0 * $total / $.;
+
+print $mean . $/;

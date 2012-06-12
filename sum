@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+my $index = shift || 0;
+
+while (my $line = <>) {
+  chomp($line);
+  my @tokens = split(' ',$line);
+  $total += $tokens[$index];
+}
+print $total . $/;

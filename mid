@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+# returns the specified line from a file or list of files
+# if the line number is given as i:j or i-j, selects that range
+# if no file is given, we read from STDIN
+
+# Usage: mid <lineno> [files]
+# Usage: cat <file> | mid <lineno>
+
+my $arg = shift;
+($num1,$split,$num2) = split(/([:\-\+])/,$arg);
+exit if ($split and ! $num2);
+
+my $i = $num1;
+my $j = ($split)
+	? ( ($split eq "+") ? ($num1 + $num2) : ($num2) )
+	: $num1;
+
+#print STDERR "$i,$split,$j\n";
+
+exit unless $i > 0;
+
+if (@ARGV > 1) {
+  # if multiple files are given, recurse to calling mid on each one
+  map { system("$0 $i $_") } @ARGV;
+} else {
+  # else, just print the ith line
+  while (my $line = <>) {
+    next if $. < $i;
+    print $line;
+	last if $. >= $j;
+  }
+}

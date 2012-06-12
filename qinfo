@@ -1,0 +1,185 @@
+#!/usr/bin/env Rscript
+
+## This file provides a nicely formatted display of
+## the number of jobs and number of CPU's running
+## and queued
+
+## By default it provides this informtion for each available queue, as well as
+## combined across all queues
+
+## Revision History
+## Gregory Warnes -- greg@warnes.net
+## Initial version
+## For the University of Rochester Bluehive cluster
+##
+## Matt Post -- post@jhu.edu
+## 2011-03-24
+## Adapted for the HLTCOE grid
+
+center <- function (text, width)
+  {
+    nspace <- floor((width - nchar(text))/2)
+    paste( paste(rep(" ", nspace),collapse=""), text, sep="" )
+  }
+
+queueSummary <- function( queueName, user.details=TRUE )
+  {
+    if(missing(queueName))
+      queueLabel <- "All Queues"
+    else
+      queueLabel <- paste("Queue '", queueName, "'", sep="")
+    
+
+    pageTitle = paste("HLTCOE Cluster Status - ", queueLabel, sep="")
+    cat("\n")
+    cat(center(pageTitle,60),"\n")
+
+    qstatFile <- tempfile()
+    err <- system(paste("/home/hltcoe/mpost/bin/qstat-r.pl > ", qstatFile), intern=TRUE )
+    
+    qstat <- NULL
+    tryCatch(     
+             qstat <- read.table(file=qstatFile, skip=0, header=FALSE, fill=TRUE),
+             finally = file.remove(qstatFile)
+             )
+
+    if(is.null(qstat) || nchar(qstat)<1 )
+      {
+        cat("\nNo jobs.\n\n")
+        return();
+      }
+
+    colnames(qstat) <- c("JobID","prior","JobName","User","Status",
+			 "StartDate","StartTime","Assigned","Slots","Queue")
+
+    if(!missing(queueName))
+      {
+        ## drop entries for other queues
+        matches <- qstat$Queue==queueName
+        if(sum(matches)<1)
+          {
+            cat("\nNo jobs.\n\n")
+            return();
+          }
+        qstat <- qstat[matches,]
+      }
+
+    ## Replace '--' in Nodes column (i.e. for JobArray elements) with '1'
+    qstat$Slots[qstat$Slots=="--"] <- 1
+    qstat$Slots <- as.numeric(as.character(qstat$Slots))
+
+    qstat$Jobs <- 1
+
+    running <- qstat[qstat$Status=="r",]
+    queued  <- qstat[qstat$Status=="qw",]
+
+
+    show.counts <- function( mat, title, user.details=TRUE )
+      {
+        jobinfo <- mat[,c("Jobs","Slots"),drop=FALSE]
+        userinfo <- split(jobinfo, mat$User)
+        results <- t(sapply(userinfo, colSums))
+        results <- results[ rowSums(results)>0,,drop=FALSE]
+        equals = rep("=====",2)
+        dashes = rep("-----",2)
+        if(user.details) 
+          {
+            results <- rbind(
+                           "========"=equals,
+                           results,
+                           "--------"=dashes,
+                           total=colSums(results)
+                           )
+            results <- cbind( User=rownames(results), results )
+          } else
+          {
+            totals <- rbind(equals, colSums(results))
+            colnames(totals) <- colnames(results)
+            results <- cbind(Users=c("=====",nrow(results)), totals)
+          }
+        row.names(results) <- rep("", nrow(results))
+        cat("\n")
+
+        cat(center(title, 28), "\n", sep="")
+        cat(rep("=", 28), "\n", sep="")
+
+        cat("\n")
+        print(results, quote=FALSE, row.names=F)
+        invisible(results)
+      }
+
+    joinAsColumns <- function()
+      {
+        m1 <- capture.output( 
+                             running.mat <- show.counts(running,
+                                                        user.details=user.details,
+                                                        title="Running Jobs")
+                             )
+        
+        m2 <- capture.output(
+                             queued.mat <- show.counts(queued, 
+                                                       user.details=user.details,
+                                                       title="Queued Jobs")
+                             )
+
+        # equalize vector lengths
+        delta <- length(m1) - length(m2) 
+	if(delta>0) m2 <- c(m2, rep("", delta) )
+	if(delta<0) m1 <- c(m1, rep("", -delta) )
+
+        m1 <- sprintf("%-28s", m1)
+        m2 <- sprintf("%-28s", m2)
+
+        cat(paste(m1, m2, sep="    ", collapse="\n"))
+        cat("\n\n")
+        
+      }
+
+    joinAsColumns()
+  }
+
+args <- commandArgs(TRUE)
+
+if("-h" %in% args || "--help" %in% args )
+  {
+    cat("\n")
+    cat("Usage:    qinfo [-h|--help] [-a|--all] [-s|--summary] [<queue name(s)>]\n")
+    cat("\n")
+    cat("  Display running and queued jobs for the specified queues.\n" )
+    cat("\n")
+    cat("  If no queue is specified, show overall running and queued jobs\n")
+    cat("\n")
+    cat("Arguments:\n")
+    cat("   -h or --help:    Show this message\n")
+    cat("   -a or --all:     Show table for each avialable queue\n")
+    cat("   -s or --summary: Only show queue totals, omitting user information\n")
+    cat("\n")
+    cat("\n")
+    q("no")
+  }
+
+if("-s" %in% args || "--summary" %in% args )
+{
+  USER_DETAILS <- FALSE
+} else {
+  USER_DETAILS <- TRUE
+}
+
+
+if("-a" %in% args || "--all" %in% args )
+  {
+    queueList <- system("qstat -Q | awk '{print $1}'", intern=TRUE)[-(1:2)]
+    for( queueName in queueList )
+      queueSummary( queueName, user.details=USER_DETAILS )
+    q("no")
+  }
+
+queueList <- grep("^-", args, value=TRUE, invert=TRUE)
+
+if(length(queueList) < 1) {
+  queueSummary( user.details=USER_DETAILS )
+} else {
+  for( queueName in queueList ) queueSummary( queueName, user.details=USER_DETAILS)
+}
+
+  
