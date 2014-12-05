@@ -1,17 +1,8 @@
 #!/usr/bin/perl
+# Takes a list of lines on STDIN and prints them out in shuffled order.
 
-while (<>) {
-    chomp();
-    $lines[$.-1] = $_;
-}
+use strict;
+use warnings;
 
-for ($i = 0; $i <= $#lines; $i++) {
-    $tmp = $lines[$i];
-    $j = $i + int(rand($#lines + 1 - $i));
-    $lines[$i] = $lines[$j];
-    $lines[$j] = $tmp;
-}
-
-for ($i = 0; $i <= $#lines; $i++) {
-    print $lines[$i] . "\n";
-}
+use List::Util qw/shuffle/;
+print join('', shuffle(<>));
