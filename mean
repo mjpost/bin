@@ -1,13 +1,28 @@
-#!/usr/bin/perl
+#!/usr/bin/env python
 
-my $index = shift || 0;
+import os
+import sys
+import argparse
 
-while (my $line = <>) {
-  chomp($line);
-  my @tokens = split(' ',$line);
-  $total += $tokens[$index];
-}
+arg_parser = argparse.ArgumentParser()
+arg_parser.add_argument('-p', dest='precision', type=int, default=5, help='number of decimal points')
+arg_parser.add_argument('-i', dest='index', type=int, default=0, help='column index to use')
+arg_parser.add_argument('-v', action="store_true", default=False, help='be verbose')
+args = arg_parser.parse_args()
 
-my $mean = 1.0 * $total / $.;
+total = 0.0
+i = 0
+for i, line in enumerate(sys.stdin):
+    total += float(line.rstrip().split()[args.index])
 
-print $mean . $/;
+divisor = 1.0
+if os.path.basename(sys.argv[0]) == 'mean':
+    divisor = i + 1
+
+if args.v:
+    formatstr = "%%.%df / %d = %%.%df" % (args.precision, i + 1, args.precision)
+    print formatstr % (total, total / (i + 1))
+else:
+    formatstr = "%%.%df" % args.precision
+    print formatstr % (total / (i + 1))
+
