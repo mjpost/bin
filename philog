@@ -2,6 +2,7 @@
 
 use strict;
 
+# Save logfile in directory instead of globally
 my $logfile = "./.philog.LOGFILE";
 
 my $date = `date`; chop($date);
@@ -45,11 +46,13 @@ elsif ($#ARGV-$pretty-$clean == -1) {
 	close(LOG);	
 }
 elsif ($curdir) {
-	open(LOG,$logfile);
+  if (!	open(LOG,$logfile)) {
+    print "No logfile found in current directory.\n";
+    exit 0;
+  }
 	while(<LOG>) {
 		/^(... ... .. ..:..:.. ..T 20..) (\S+) (.+)$/;
 		my ($time,$dir,$cmd) = ($1,$2,$3);
-		next unless &same_dir($dir,$pwd);
 		if ($pretty) {
 	    print "\e[32m$time ".($cmd=~/^[\#\^]/?"\e[30;1m":"\e[m").$cmd."\e[m\n";
 		}
