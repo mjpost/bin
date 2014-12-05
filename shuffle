@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+while (<>) {
+    chomp();
+    $lines[$.-1] = $_;
+}
+
+for ($i = 0; $i <= $#lines; $i++) {
+    $tmp = $lines[$i];
+    $j = $i + int(rand($#lines + 1 - $i));
+    $lines[$i] = $lines[$j];
+    $lines[$j] = $tmp;
+}
+
+for ($i = 0; $i <= $#lines; $i++) {
+    print $lines[$i] . "\n";
+}
