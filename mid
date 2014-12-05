@@ -1,24 +1,19 @@
 #!/usr/bin/perl
 
-# returns the specified line from a file or list of files
-# if the line number is given as i:j or i-j, selects that range
-# if no file is given, we read from STDIN
-
-# Usage: mid <lineno> [files]
-# Usage: cat <file> | mid <lineno>
+# Returns the requested line number from a file or list of files.
+# If the line number is given as i:j or i-j, selects that range.
+# If no file is given, we read from STDIN.
 
 my $arg = shift;
 ($num1,$split,$num2) = split(/([:\-\+])/,$arg);
-exit if ($split and ! $num2);
+die usage() unless $arg and (! $split or $num2);
 
 my $i = $num1;
 my $j = ($split)
-	? ( ($split eq "+") ? ($num1 + $num2) : ($num2) )
-	: $num1;
+        ? ( ($split eq "+") ? ($num1 + $num2) : ($num2) )
+        : $num1;
 
-#print STDERR "$i,$split,$j\n";
-
-exit unless $i > 0;
+exit usage() unless $i > 0;
 
 if (@ARGV > 1) {
   # if multiple files are given, recurse to calling mid on each one
@@ -28,6 +23,19 @@ if (@ARGV > 1) {
   while (my $line = <>) {
     next if $. < $i;
     print $line;
-	last if $. >= $j;
+    last if $. >= $j;
   }
 }
+
+sub usage() {
+  print STDERR <<EOF;
+Prints the Nth line of a file or of each of a list of files.
+
+Usage: 
+    mid LINENO FILE1 [FILE2 FILE3 ...]
+    cat FILE | mid LINENO
+where LINENO is the line number of the file (starting with 1).
+EOF
+  exit(1);
+}
+
