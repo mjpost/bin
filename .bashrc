@@ -1,5 +1,5 @@
 # Import colors
-. ~/.bashrc-colors
+. ~/bin/.bashrc-colors
 
 # Set up "Philipp's log" aliases
 alias p="philog"
