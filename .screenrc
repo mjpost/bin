@@ -1,0 +1,18 @@
+escape ^]]
+defescape ^]]
+backtick 0 30 30 sh -c 'screen -ls | grep --color=no -o "$PPID[^[:space:]]*" | cut -d. -f2'
+hardstatus string '[%`]'
+#backtick 1 5 5 "/bin/echo $STY"
+#hardstatus string "[screen]"
+#hardstatus alwayslastline "%1`"
+#caption     always        "%{+b yk}%H%{gk} |%C %{yk}%Y-%m-%d| WINDOW #%n %72=Load: %l %{wk}"
+
+# The available windows centered at the current window and  truncated  to  the
+# available width. The current window is displayed white on blue.  This can be
+# used with "hardstatus alwayslastline".
+#caption always       "%-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%< %72=Load: %l"
+
+# http://en.gentoo-wiki.com/wiki/Screen#Tab-bar
+caption always '%{= dg} %{G}| %{B}%l %{G}|%=%?%{d}%-w%?%{r}(%{d}%n %t%? {%u}%?%{r})%{d}%?%+w%?%=%{G}| %{B}%M %d %c:%s '
+
+#caption     always        "%{+b BW}%H |%Y-%m-%d %C| window #%n %72=Load: %l"
