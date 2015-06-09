@@ -1,6 +1,21 @@
 #!/usr/bin/perl -w
 
+# Put these in your .bashrc
+# 
+# # print the saved commands
+# alias p="philog"
+# alias pp="philog -pretty"
+# alias ppd="philog -pretty -dir"
+# alias pd="philog -dir"
+#
+# # edit the command cache
+# alias pe="vi .philog.LOGFILE"
+#
+# # save the last command
+# alias ph="history | philog -history"
+
 use strict;
+use warnings;
 
 # Save logfile in directory instead of globally
 my $logfile = "./.philog.LOGFILE";
