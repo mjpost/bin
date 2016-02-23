@@ -1,10 +1,24 @@
-#!/usr/bin/perl
+#!/usr/bin/python
 
-my $index = shift || 0;
+import re
+import sys
+import locale
+import argparse
 
-while (my $line = <>) {
-  chomp($line);
-  my @tokens = split(' ',$line);
-  $total += $tokens[$index];
-}
-print $total . $/;
+locale.setlocale(locale.LC_ALL, 'en_US')
+
+parser = argparse.ArgumentParser(description='Sum numbers in a column of text')
+parser.add_argument('col', type=int, default=-1, help='Which column? (0-indexed)')
+parser.add_argument('-p', dest='pretty', default=False, action='store_true', help='Pretty-print')
+parser.add_argument('-b', dest='bytes', default=False, action='store_true', help='Summarize')
+args = parser.parse_args()
+
+total = 0
+for line in sys.stdin:
+    tokens = re.split(r'\s+', line.rstrip())
+    total += float(tokens[args.col])
+
+if args.pretty:
+    print locale.format("%d", total, grouping=True)
+else: 
+    print int(total)
