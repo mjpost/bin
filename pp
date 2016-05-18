@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+"""
+Does pretty-printing of numbers.
+Usage:
+    echo 382834242324 | pp
+    -> prints 382,834,242,324 
+"""
+
 import sys
 import locale
 
