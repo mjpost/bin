@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 
-# splits on tab, printing respective chunks to the list of files given
-# as script arguments
+# Splits on tab, printing respective chunks to the list of files given
+# as script arguments. Note: if there are more fields than files, the
+# remaining fields are silently discarded.
 
 use FileHandle;
 
@@ -18,9 +19,9 @@ my @fh = map { get_filehandle($_) } @ARGV;
 
 while (my $line = <>) {
   chomp($line);
-  my (@fields) = split(/\t/,$line,scalar @fh);
+  my (@fields) = split(/\t/, $line);
   
-  map { print {$fh[$_]} "$fields[$_]\n" } (0..$#fields);
+  map { print {$fh[$_]} "$fields[$_]\n" } (0..$#fh);
 }
 
 sub get_filehandle {
