@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -C31
 
 # Returns the requested line number from a file or list of files.
 # If the line number is given as i:j or i-j, selects that range.
