@@ -2,6 +2,20 @@
 
 """
 Converts among language names and abbreviations using Python's ISO-639 module.
+https://pypi.python.org/pypi/iso-639/0.4.3
+
+    > from iso639 import languages as l
+    > greek = l.get(part1 = 'el')
+    > pprint(vars(greek))
+    {'inverted': 'Greek, Modern (1453-)',
+     'macro': '',
+     'name': 'Modern Greek (1453-)',
+     'names': [],
+     'part1': 'el',
+     'part2b': 'gre',
+     'part2t': 'ell',
+     'part3': 'ell',
+     'part5': ''}
 """
 
 import sys
