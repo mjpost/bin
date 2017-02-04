@@ -1,0 +1,7 @@
+#!/bin/env perl
+
+while (<>) {
+  s/^\s+//;
+  s/\s+$//;
+  print $_ . $/;
+}
