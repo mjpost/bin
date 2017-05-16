@@ -46,15 +46,14 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
                                    stdin = subprocess.PIPE)
 
     def handle(self):
-        self.data = self.rfile.readline().strip()
+        self.data = self.rfile.readlines()
 
-        self.process.stdin.write(self.data + '\n')
-        response = self.process.stdout.readline()
-
-        if args.verbose:
-            sys.stderr.write("{} {} -> {}".format(self.client_address[0], self.data, response))
-
-        self.wfile.write(response)
+        for lineno, line in enumerate(self.data, 1):
+            self.process.stdin.write(line)
+            response = self.process.stdout.readline()
+            if args.verbose:
+                sys.stderr.write("{}/{} {} -> {}".format(self.client_address[0], lineno, line.rstrip(), response))
+            self.wfile.write(response)
 
     def finish(self):
         SocketServer.StreamRequestHandler.finish(self)
