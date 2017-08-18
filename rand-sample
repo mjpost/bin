@@ -3,7 +3,6 @@
 # 	Benjamin Van Durme, vandurme@cs.rochester.edu, 13 Mar 2008
 # 	Time-stamp: <2010-02-11 23:29:09 vandurme>
 
-
 # Purpose: takes a value k, and an input stream of text. Outputs k lines of text
 # drawn uniformly at random from stream.
 
