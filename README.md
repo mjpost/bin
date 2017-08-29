@@ -4,6 +4,8 @@ This is a collection of utilities I use a lot, many of which I consider to be ga
 UNIX toolset. Released into the public domain.
 Matt Post
 
+- zpaste. A version of "paste" that also allows compressed files.
+
 - expose. Allows a standard UNIX command or pipeline to be exposed as a lightweight web service.
 
 - iso639. Converts among ISO 639 codes and names.

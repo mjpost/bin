@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# "paste" annoyingly only works with uncompressed files. This changes that.
+
+filestr=""
+
+for file in "$@"; do
+    [[ ! -e "$file" ]] && echo "No such file '$file'" && exit 1
+    if [[ "$file" =~ \.gz$ ]]; then
+	    filestr+="<(gzip -cd $file) "
+    elif [[ "$file" =~ \.gz2$ ]]; then
+        filestr+="<(bzip2 -cd $file) "
+    else
+	    filestr+="$file "
+    fi
+done
+
+eval paste $filestr
