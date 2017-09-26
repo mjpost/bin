@@ -1,7 +1,5 @@
-#!/bin/env perl
+#!/usr/bin/env python3
 
-while (<>) {
-  s/^\s+//;
-  s/\s+$//;
-  print $_ . $/;
-}
+import sys
+for line in sys.stdin:
+    print(line.strip())
