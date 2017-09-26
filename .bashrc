@@ -1,6 +1,16 @@
 # Import colors
 . ~/bin/.bashrc-colors
 
+if [[ $(which powerline-shjell) -eq 0 ]]; then
+    function _update_ps1() {
+        PS1="$(powerline-shell $?)"
+    }
+
+    if [ "$TERM" != "linux" ]; then
+        PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+    fi
+fi
+
 # Set up "Philipp's log" aliases
 alias p="philog"
 alias pp="philog -pretty"
@@ -11,7 +21,7 @@ alias ph="history | philog -history"
 
 case $TERM in
     xterm*)
-        PS1="\[\033]0;\u@\h: \w\007\]${BLUE}\$ ${NONE}"
+        PS1="\[\033]0; \w\007\]${BLUE}\$ ${NONE}"
         ;;
     *)
         PS1="\w\$ "
