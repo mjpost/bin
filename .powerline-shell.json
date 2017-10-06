@@ -1,0 +1,10 @@
+{
+  "segments": [
+    "time",
+    "virtual_env",
+    "ssh",
+    "cwd",
+    "git",
+    "root"
+  ]
+}
