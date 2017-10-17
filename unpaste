@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+
+"""
+Takes a stream on STDIN and writes fields from that stream to the list of files
+specified as arguments.
+
+    paste file1 file2 | ./unpaste file1.copy file2.copy
+
+"""
+
+import sys
+import argparse
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--tee', '-t', action='store_true', default=False,
+                        help='Also echo to STDOUT')
+    parser.add_argument('--delimiter', '-d', type=str, default='\t',
+                        help='Delimiter to use')
+    parser.add_argument('files', nargs='+', 
+                        help='File(s) to write to')
+    args = parser.parse_args()
+
+    def _writeto(filename):
+        if filename.endswith('.gz'):
+            import gzip
+            return gzip.open(filename, 'wt')
+        else:
+            return open(filename, 'wt')
+
+    fhs = list(map(lambda x: _writeto(x), args.files))
+
+    for line in sys.stdin:    
+        line = line.rstrip('\n')
+        fields = line.split(args.delimiter)
+        for i, field in enumerate(fields):
+            print(field, file=fhs[i], flush=True)
+
+        if args.tee:
+            print(line, flush=True)
+
+        # TODO: don't buffer
+
+    for fh in fhs:
+        fh.close()
