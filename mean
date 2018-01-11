@@ -21,8 +21,8 @@ if os.path.basename(sys.argv[0]) == 'mean':
 
 if args.v:
     formatstr = "%%.%df / %d = %%.%df" % (args.precision, i + 1, args.precision)
-    print formatstr % (total, total / (i + 1))
+    print(formatstr % (total, total / (i + 1)))
 else:
     formatstr = "%%.%df" % args.precision
-    print formatstr % (total / (i + 1))
+    print(formatstr % (total / (i + 1)))
 
