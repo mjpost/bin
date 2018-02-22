@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Convenience script that invokes the Moses preprocessing scheme.
+# Assumes that you have Moses installed somewhere and $MOSES points to it.
+#
+#     cat corpus.txt | moses_tokenizer LANG > corpus.tok.txt
+#
+# LANG is optional and defaults to "en".
+
+if [[ -z $MOSES ]]; then
+   echo "Where is Moses?"
+   exit
+fi
+
+lang=${1:-en}
+
+$MOSES/scripts/tokenizer/normalize-punctuation.perl -l $lang \
+    | $MOSES/scripts/tokenizer/remove-non-printing-char.perl \
+    | $MOSES/scripts/tokenizer/tokenizer.perl -q -no-escape -protected $MOSES/scripts/tokenizer/basic-protected-patterns -l $lang
