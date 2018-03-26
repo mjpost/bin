@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+
+"""
+Filters lines out of STDIN. Works by taking a list of lines numbers to keep as the script's first
+argument. Then walks through STDIN, keeping only line numbers that were found in the list that
+was read in.
+
+Usage:
+
+    cat unfiltered_file | ./filter_lines.py [--reverse|-r] list_of_lines
+"""
+
+import argparse
+import typing
+import sys
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("lines_file", type=str,
+                        help="File containing sorted (low to high) line numbers to keep (counting from 1)")
+    parser.add_argument('--remove', '-r', action='store_true',
+                        help='lines_file contains lines to remove instead of lines to keep')
+    args = parser.parse_args()
+
+    def get_next_line(file):
+        """
+        Returns the next line to keep.
+        """
+        with open(file, encoding='utf-8') as lines_in:
+            for line in lines_in:
+                yield int(line.rstrip())
+
+    lines_stream = get_next_line(args.lines_file)
+
+    next_line_to_keep = next(lines_stream)
+    for i, line in enumerate(sys.stdin, 1):
+        if i == next_line_to_keep:
+            if not args.remove:
+                print(line, end='', flush=True)
+            try:
+                next_line_to_keep = next(lines_stream)
+            except StopIteration:
+                next_line_to_keep = 0
+        elif args.remove:
+            print(line, end='', flush=True)
+
+if __name__ == "__main__":
+    main()
