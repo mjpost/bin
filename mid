@@ -1,46 +1,68 @@
-#!/usr/bin/perl -C31
+#!/usr/bin/env python3
 
-# Returns the requested line number from a file or list of files.
-# If the line number is given as i:j or i-j, selects that range.
-# If no file is given, we read from STDIN.
-
-my $arg = shift;
-($num1,$split,$num2) = split(/([:\-\+])/,$arg);
-die usage() unless $arg and (! $split or $num2);
-
-my $i = $num1;
-my $j = ($split)
-        ? ( ($split eq "+") ? ($num1 + $num2) : ($num2) )
-        : $num1;
-
-exit usage() unless $i > 0;
-
-if (@ARGV > 1) {
-    # if multiple files are given, recurse to calling mid on each one
-    foreach my $file (@ARGV) {
-        if ($file =~ /.gz$/) {
-            system("zcat -f $file | $0 $i");
-        } else {
-            system("cat $file | $0 $i");
-        }
-    }
-} else {
-  # else, just print the ith line
-  while (my $line = <>) {
-    next if $. < $i;
-    print $line;
-    last if $. >= $j;
-  }
-}
-
-sub usage() {
-  print STDERR <<EOF;
+"""
 Prints the Nth line of a file or of each of a list of files.
+Default file is sys.stdin.
 
 Usage:
-    mid LINENO FILE1 [FILE2 FILE3 ...]
-    cat FILE | mid LINENO
-where LINENO is the line number of the file (starting with 1).
-EOF
-  exit(1);
-}
+   mid LINENO FILE1 [FILE2 FILE3 ...]
+   cat FILE | mid LINENO
+where LINENO is the 1-indexed line number to display (or a range: M-N).
+"""
+
+import os
+import sys
+import gzip
+import argparse
+from itertools import zip_longest
+
+def main(args):
+    if '-' in args.lines:
+        start, stop = map(lambda x: int(x), args.lines.split('-'))
+    elif '+' in args.lines:
+        start, stop = map(lambda x: int(x), args.lines.split('+'))
+        stop = start + stop
+    else:
+        start = int(args.lines)
+        stop = int(args.lines)
+
+    for i, lines in enumerate(zip_longest(*args.files), 1):
+        if i < start:
+            continue
+        if i > stop:
+            break
+
+        for j, line in enumerate(lines):
+            if line is not None:
+                if args.verbose:
+                    print('=== {}'.format(args.files[j].name), line.rstrip(), '', sep='\n')
+                else:
+                    print(line.rstrip(),)
+
+def smart_read(filename: str):
+    try:
+        if filename == '-':
+            return sys.stdin
+        elif filename.endswith('.gz'):
+            return gzip.open(filename, mode='rt', encoding='utf-8')
+        else:
+            return open(filename, mode='rt', encoding='utf-8')
+    except FileNotFoundError as e:
+        print("Can't find file '{}'".format(filename))
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser('Grabs a line from one or more files')
+    parser.add_argument('--verbose', '-v', default=False, action='store_true',
+			help='Display head-style file headers if there is more than one file')
+    parser.add_argument('lines',
+			help='The line number (N) or range (M-N or M:N) to display')
+    parser.add_argument('files',
+                        nargs='*',
+                        type=smart_read,
+                        default=[sys.stdin],
+			help='The files to work with')
+    args = parser.parse_args()
+
+    main(args)
