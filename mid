@@ -16,8 +16,14 @@ my $j = ($split)
 exit usage() unless $i > 0;
 
 if (@ARGV > 1) {
-  # if multiple files are given, recurse to calling mid on each one
-  map { system("$0 $i $_") } @ARGV;
+    # if multiple files are given, recurse to calling mid on each one
+    foreach my $file (@ARGV) {
+        if ($file =~ /.gz$/) {
+            system("zcat -f $file | $0 $i");
+        } else {
+            system("cat $file | $0 $i");
+        }
+    }
 } else {
   # else, just print the ith line
   while (my $line = <>) {
@@ -31,11 +37,10 @@ sub usage() {
   print STDERR <<EOF;
 Prints the Nth line of a file or of each of a list of files.
 
-Usage: 
+Usage:
     mid LINENO FILE1 [FILE2 FILE3 ...]
     cat FILE | mid LINENO
 where LINENO is the line number of the file (starting with 1).
 EOF
   exit(1);
 }
-
