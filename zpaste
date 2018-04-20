@@ -1,18 +1,41 @@
-#!/bin/bash
+#!/usr/bin/env python3
 
-# "paste" annoyingly only works with uncompressed files. This changes that.
+"""
+"paste" annoyingly only works with uncompressed files. This changes that.
+"""
 
-filestr=""
+import sys
+import gzip
+from itertools import zip_longest
 
-for file in "$@"; do
-    [[ ! -e "$file" ]] && echo "No such file '$file'" && exit 1
-    if [[ "$file" =~ \.gz$ ]]; then
-	    filestr+="<(gzip -cd $file) "
-    elif [[ "$file" =~ \.gz2$ ]]; then
-        filestr+="<(bzip2 -cd $file) "
-    else
-	    filestr+="$file "
-    fi
-done
+def smart_read(filename: str):
+    try:
+        if filename == '-':
+            return sys.stdin
+        elif filename.endswith('.gz'):
+            return gzip.open(filename, mode='rt', encoding='utf-8')
+        else:
+            return open(filename, mode='rt', encoding='utf-8')
+    except FileNotFoundError as e:
+        print("Can't find file '{}'".format(filename))
+        sys.exit(1)
 
-eval paste $filestr
+def main(args):
+    zip_func = zip if args.shortest else zip_longest
+    for i, lines in enumerate(zip_func(*args.files), 1):
+        print(args.delimiter.join([x.rstrip() if x is not None else '' for x in lines]))
+
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser('A better UNIX paste')
+    parser.add_argument('-d', '--delimiter', default='\t', type=str, help='Delimiter')
+    parser.add_argument('--shortest', action='store_true', help='Stop when the first file runs out')
+    parser.add_argument('files',
+                        nargs='+',
+                        type=smart_read,
+                        default=[sys.stdin],
+			help='The file streams to paste together')
+    args = parser.parse_args()
+
+    main(args)
