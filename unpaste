@@ -39,6 +39,9 @@ if __name__ == '__main__':
         for i, field in enumerate(fields):
             print(field, file=fhs[i], flush=True)
 
+        for i in range(len(fields), len(fhs)):
+            print(file=fhs[i], flush=True)
+
         if args.tee:
             print(line, flush=True)
 
