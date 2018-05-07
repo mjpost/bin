@@ -2,7 +2,9 @@
 
 """
 Takes a stream on STDIN and writes fields from that stream to the list of files
-specified as arguments.
+specified as arguments. If there are more fields than files, the last file will
+get all remaining fields. If there are more files than fields, files beyond the
+last field will get blank lines.
 
     paste file1 file2 | ./unpaste file1.copy file2.copy
 
@@ -18,7 +20,7 @@ if __name__ == '__main__':
                         help='Also echo to STDOUT')
     parser.add_argument('--delimiter', '-d', type=str, default='\t',
                         help='Delimiter to use')
-    parser.add_argument('files', nargs='+', 
+    parser.add_argument('files', nargs='+',
                         help='File(s) to write to')
     args = parser.parse_args()
 
@@ -31,16 +33,14 @@ if __name__ == '__main__':
 
     fhs = list(map(lambda x: _writeto(x), args.files))
 
-    for line in sys.stdin:    
+    for line in sys.stdin:
         line = line.rstrip('\n')
-        fields = line.split(args.delimiter)
+        fields = line.split(args.delimiter, maxsplit=len(fhs)-1)
         for i, field in enumerate(fields):
             print(field, file=fhs[i], flush=True)
 
         if args.tee:
             print(line, flush=True)
-
-        # TODO: don't buffer
 
     for fh in fhs:
         fh.close()
