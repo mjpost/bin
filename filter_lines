@@ -14,7 +14,31 @@ import argparse
 import typing
 import sys
 
+def check(last_line: int, current_line: int):
+    if current_line <= last_line:
+        print('* FATAL: current line (%d) less than or equal to the last line (%d)' % (current_line, last_line), file=sys.stderr)
+        sys.exit(1)
+    return current_line
+
+def get_next_line(filestream, lines):
+    """
+    Returns the next line to keep.
+    """
+    last_line = 0
+    if filestream is not None:
+        for line in filestream:
+            yield check(last_line, int(line.rstrip()))
+    elif len(lines) > 0:
+        for line in lines:
+            yield check(last_line, line)
+    else:
+        yield ''
+
+
+
 def main():
+
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', '-f', type=argparse.FileType('r', encoding='utf-8'), default=None,
                         help="File containing sorted (low to high) line numbers to keep (counting from 1)")
@@ -23,19 +47,6 @@ def main():
     parser.add_argument('--remove', '-r', action='store_true',
                         help='Remove specified lines instead of keeping them')
     args = parser.parse_args()
-
-    def get_next_line(filestream, lines):
-        """
-        Returns the next line to keep.
-        """
-        if filestream is not None:
-            for line in filestream:
-                yield int(line.rstrip())
-        elif len(lines) > 0:
-            for line in lines:
-                yield line
-        else:
-            yield ''
 
     lines_stream = get_next_line(args.file, args.lines)
 
