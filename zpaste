@@ -23,14 +23,17 @@ def smart_read(filename: str):
 def main(args):
     zip_func = zip if args.shortest else zip_longest
     for i, lines in enumerate(zip_func(*args.files), 1):
+        if args.head != 0 and i > args.head:
+            break
         print(args.delimiter.join([x.rstrip() if x is not None else '' for x in lines]))
 
 if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser('A better UNIX paste')
-    parser.add_argument('-d', '--delimiter', default='\t', type=str, help='Delimiter')
-    parser.add_argument('--shortest', action='store_true', help='Stop when the first file runs out')
+    parser.add_argument('-d', '--delimiter', default='\t', type=str, help='Delimiter to split on. Default: %(default)s.')
+    parser.add_argument('--shortest', action='store_true', help='Stop when the first file runs out.')
+    parser.add_argument('--head', type=int, default=0, help='Only output first HEAD lines. Default: %(default)s.')
     parser.add_argument('files',
                         nargs='+',
                         type=smart_read,
