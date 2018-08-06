@@ -1,29 +1,38 @@
-#!/usr/bin/perl -w
-#
-# 	Benjamin Van Durme, vandurme@cs.rochester.edu, 13 Mar 2008
-# 	Time-stamp: <2010-02-11 23:29:09 vandurme>
-#
-# Perl reservoir sampler. Linear-time uniform sampling of k items from an arbitrary-length stream.
+#!/usr/bin/env python3
 
-my $k = shift || die "Usage: rand-sample <k>";
-my @sample;
+"""
+Reservoir sampler in Python. Selects k items uniformly at random from an arbitrary-length stream.
+"""
 
-$i = 1;
+import argparse
+import random
+import sys
 
-# Fill bucket with first k items
-while ($line = <>) {
-    if ($i <= $k) {
-	$sample[$i-1] = $line;
-    } else {
-	# With probability k/i, accept new element from stream, replace a random
-	# element of the bucket with new element.
-	if (rand() < ($k/$i)) {
-	    $sample[int(rand($k))] = $line;
-	}
-    }
-    $i++;
-}
+def main(args):
 
-foreach $line (@sample) {
-    print $line;
-}
+    samples = []
+
+    for i, line in enumerate(sys.stdin, 1):
+
+        line = line.rstrip()
+
+        if len(samples) < args.num_samples:
+            samples.append(line)
+        else:
+            # Accept new element from the stream with probability num_samples / i,
+            # and replace a random element of the sample with it.
+            if random.random() < 1. * args.num_samples / i:
+                where = random.randint(0, args.num_samples - 1)
+                samples[where] = line
+
+    print('\n'.join(samples))
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--seed', type=int, default=None)
+    parser.add_argument('num_samples', type=int, nargs='?', default=10)
+    args = parser.parse_args()
+
+    random.seed(args.seed)
+
+    main(args)
