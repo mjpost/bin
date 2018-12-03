@@ -1,0 +1,5 @@
+#!/bin/bash
+
+: ${lang=en}
+
+debpe | $MOSES/scripts/tokenizer/detokenizer.perl -q -l $lang
