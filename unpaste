@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-"""
-Takes a stream on STDIN and writes fields from that stream to the list of files
-specified as arguments. If there are more fields than files, the last file will
-get all remaining fields. If there are more files than fields, files beyond the
-last field will get blank lines.
+""" 
+Takes a tab-delimited stream on STDIN and writes the columns in turn to the files specified as
+arguments (i.e., the opposite of UNIX `paste`). If there are more fields than files, the last file
+will get all remaining fields. If there are more files than fields, files beyond the last field will
+get blank lines.
 
-    paste file1 file2 | ./unpaste file1.copy file2.copy
+    paste file1 file2 [...] | ./unpaste file1.copy file2.copy [...]
 
+Author: Matt Post <post@cs.jhu.edu>
 """
 
 import sys
