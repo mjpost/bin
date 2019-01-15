@@ -2,6 +2,8 @@
 
 """
 "paste" annoyingly only works with uncompressed files. This changes that.
+
+Author: Matt Post <post@cs.jhu.edu
 """
 
 import sys

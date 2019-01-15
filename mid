@@ -2,12 +2,16 @@
 
 """
 Prints the Nth line of a file or of each of a list of files.
-Default file is sys.stdin.
+Default input stream is sys.stdin.
 
 Usage:
-   mid LINENO FILE1 [FILE2 FILE3 ...]
+   mid [-v] LINENO FILE1 [FILE2 FILE3 ...]
    cat FILE | mid LINENO
 where LINENO is the 1-indexed line number to display (or a range: M-N).
+If `-v` is present, it will print a UNIX `head`-style header above each
+file, identifying its provenance.
+
+Author: Matt Post <post@cs.jhu.edu>
 """
 
 import os
