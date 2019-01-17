@@ -15,5 +15,5 @@ fi
 lang=${1:-en}
 
 $MOSES/scripts/tokenizer/normalize-punctuation.perl -b -l $lang \
-    | $MOSES/scripts/tokenizer/remove-non-printing-char.perl \
+    | $MOSES/scripts/tokenizer/remove-non-printing-char.perl -b \
     | $MOSES/scripts/tokenizer/tokenizer.perl -b -q -no-escape -protected $MOSES/scripts/tokenizer/basic-protected-patterns -l $lang
