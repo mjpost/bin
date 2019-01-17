@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Convenience script that invokes the Moses preprocessing scheme.
-# Assumes that you have Moses installed somewhere and $MOSES points to it.
+# Convenience script that wraps the Moses tokenizer invocation used in the Shine Training Workflow
+# for the term tokenizer. Assumes you have Moses installed somewhere. Usage:
 #
 #     cat corpus.txt | moses_tokenizer LANG > corpus.tok.txt
 #
@@ -14,6 +14,6 @@ fi
 
 lang=${1:-en}
 
-$MOSES/scripts/tokenizer/normalize-punctuation.perl -l $lang \
+$MOSES/scripts/tokenizer/normalize-punctuation.perl -b -l $lang \
     | $MOSES/scripts/tokenizer/remove-non-printing-char.perl \
-    | $MOSES/scripts/tokenizer/tokenizer.perl -q -no-escape -protected $MOSES/scripts/tokenizer/basic-protected-patterns -l $lang
+    | $MOSES/scripts/tokenizer/tokenizer.perl -b -q -no-escape -protected $(dirname $0)/basic-protected-patterns -l $lang
