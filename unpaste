@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# *-* encoding: utf-8 *-*
 
 """ 
 Takes a tab-delimited stream on STDIN and writes the columns in turn to the files specified as
@@ -17,6 +18,8 @@ import argparse
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--append', '-a', action='store_true', default=False,
+                        help='Append to files instead of overwriting.')
     parser.add_argument('--tee', '-t', action='store_true', default=False,
                         help='Also echo to STDOUT')
     parser.add_argument('--delimiter', '-d', type=str, default='\t',
@@ -25,14 +28,15 @@ if __name__ == '__main__':
                         help='File(s) to write to')
     args = parser.parse_args()
 
-    def _writeto(filename):
+    def _writeto(filename, append=False):
+        mode = 'at' if append else 'wt'
         if filename.endswith('.gz'):
             import gzip
-            return gzip.open(filename, 'wt')
+            return gzip.open(filename, mode)
         else:
-            return open(filename, 'wt')
+            return open(filename, mode)
 
-    fhs = list(map(lambda x: _writeto(x), args.files))
+    fhs = list(map(lambda x: _writeto(x, args.append), args.files))
 
     for line in sys.stdin:
         line = line.rstrip('\n')
