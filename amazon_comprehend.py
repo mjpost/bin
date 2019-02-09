@@ -6,6 +6,7 @@
 import sys
 import boto3
 import argparse
+import string
 
 def main(args):
     comprehend = boto3.client("comprehend", region_name="us-east-1")
