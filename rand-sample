@@ -14,8 +14,6 @@ def main(args):
 
     for i, line in enumerate(sys.stdin, 1):
 
-        line = line.rstrip()
-
         if len(samples) < args.num_samples:
             samples.append(line)
         else:
@@ -25,7 +23,7 @@ def main(args):
                 where = random.randint(0, args.num_samples - 1)
                 samples[where] = line
 
-    print('\n'.join(samples))
+    print(''.join(samples))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
