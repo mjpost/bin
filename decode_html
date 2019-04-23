@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+
+import html
+import sys
+
+for line in sys.stdin:
+    print(html.unescape(line.rstrip()))
