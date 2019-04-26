@@ -20,7 +20,7 @@ use warnings;
 # Save logfile in directory instead of globally
 my $logfile = "./.philog.LOGFILE";
 
-my $date = `date`; chop($date);
+my $date = chomp(`date +"%Y-%m-%d %H:%M"`)
 my $pwd = `pwd`; chop($pwd);
 my $pretty = 0; 
 my $curdir = 0;
@@ -46,9 +46,13 @@ if ($history) {
 elsif ($#ARGV-$pretty-$clean == -1) {
 	open(LOG,$logfile);
 	while(<LOG>) {
-		/^(... ... .. ..:..:.. ..T 20..) (\S+) (.+)$/;
+    if (! /^\d{4}/) { # convert old format to new
+      close(LOG);
+      upgrade_log($logfile)
+      open(LOG, $logfile)
+    }
 		my ($time,$dir,$cmd) = ($1,$2,$3);
-		if($pretty) {
+		if ($pretty) {
 	    print "\e[32m$time \e[34m$dir ".($cmd=~/^[\#\^]/?"\e[30;1m":"\e[m").$cmd."\e[m\n";
 		}
 		elsif ($clean) {
@@ -99,4 +103,15 @@ sub same_dir {
 	$a =~ s/nfs\/[^\/]+/nfs/;
 	$b =~ s/nfs\/[^\/]+/nfs/;
 	return $a eq $b;
+}
+
+def upgrade_log($file) {
+  my @entries = chomp(`cat $file`);
+  system("cp $file $file.old");
+  open(LOG, ">$file");
+  while(<LOG>) {
+    /^(...) (...) (.). (..:..:..) (..T) (20..) (\S+) (.+)$/;
+    
+  }
+  close(LOG);
 }
