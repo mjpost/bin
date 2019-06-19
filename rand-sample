@@ -30,7 +30,7 @@ def main(args):
                 where = random.randint(0, args.num_samples - 1)
                 samples[where] = line
 
-    print(''.join(samples))
+    print(''.join(samples), end='')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
