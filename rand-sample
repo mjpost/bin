@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 
 """
-Reservoir sampler in Python. Selects k items uniformly at random from an arbitrary-length stream.
+[Reservoir sampler](https://en.wikipedia.org/wiki/Reservoir_sampling) in Python. 
+Selects k items uniformly at random from an arbitrary-length stream.
+
+Usage:
+
+    cat file | rand-sample [--seed] [K=10]
+
+where `K` is the number of samples desired.
 """
 
 import argparse
@@ -23,7 +30,7 @@ def main(args):
                 where = random.randint(0, args.num_samples - 1)
                 samples[where] = line
 
-    print(''.join(samples))
+    print(''.join(samples), end='')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
