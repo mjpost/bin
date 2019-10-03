@@ -20,7 +20,9 @@ use warnings;
 # Save logfile in directory instead of globally
 my $logfile = "./.philog.LOGFILE";
 
-my $date = chomp(`date +"%Y-%m-%d %H:%M"`)
+my $DATE_FORMAT = "%Y-%m-%d %H:%M:%S";
+
+chomp(my $date = `date +"$DATE_FORMAT"`);
 my $pwd = `pwd`; chop($pwd);
 my $pretty = 0; 
 my $curdir = 0;
@@ -44,14 +46,12 @@ if ($history) {
   &log($cmd);
 }
 elsif ($#ARGV-$pretty-$clean == -1) {
-	open(LOG,$logfile);
+  upgrade_log($logfile);
+
+	open(LOG, $logfile);
 	while(<LOG>) {
-    if (! /^\d{4}/) { # convert old format to new
-      close(LOG);
-      upgrade_log($logfile)
-      open(LOG, $logfile)
-    }
-		my ($time,$dir,$cmd) = ($1,$2,$3);
+    /^(....-..-.. ..:..:..) (\S+) (.+)$/;
+		my ($time,$dir,$cmd) = ($1,$2,$3,$4);
 		if ($pretty) {
 	    print "\e[32m$time \e[34m$dir ".($cmd=~/^[\#\^]/?"\e[30;1m":"\e[m").$cmd."\e[m\n";
 		}
@@ -65,12 +65,13 @@ elsif ($#ARGV-$pretty-$clean == -1) {
 	close(LOG);	
 }
 elsif ($curdir) {
+  upgrade_log($logfile);
   if (!	open(LOG,$logfile)) {
     print "No logfile found in current directory.\n";
     exit 0;
   }
 	while(<LOG>) {
-		/^(... ... .. ..:..:.. ....? 20..) (\S+) (.+)$/;
+    /^(....-..-.. ..:..:..) (\S+) (.+)$/;
 		my ($time,$dir,$cmd) = ($1,$2,$3);
 		if ($pretty) {
 	    print "\e[32m$time ".($cmd=~/^[\#\^]/?"\e[30;1m":"\e[m").$cmd."\e[m\n";
@@ -105,13 +106,44 @@ sub same_dir {
 	return $a eq $b;
 }
 
-def upgrade_log($file) {
-  my @entries = chomp(`cat $file`);
-  system("cp $file $file.old");
-  open(LOG, ">$file");
-  while(<LOG>) {
-    /^(...) (...) (.). (..:..:..) (..T) (20..) (\S+) (.+)$/;
-    
+sub upgrade_log {
+  my ($file) = @_;
+
+  if (! -e $file) {
+    return;
   }
-  close(LOG);
+
+  my %MONTHS = (
+    "Jan" => 1,
+    "Feb" => 2,
+    "Mar" => 3,
+    "Apr" => 4,
+    "May" => 5,
+    "Jun" => 6,
+    "Jul" => 7,
+    "Aug" => 8,
+    "Sep" => 9,
+    "Oct" => 10,
+    "Nov" => 11,
+    "Dec" => 12 );
+
+  my @entries = `cat $file`;
+  if ($entries[0] !~ /^\d{4}/) { # convert old format to new
+    print STDERR "Upgrading logfile $file\n";
+    system("cp $file $file.bak") unless -e "$file.bak";
+    open(LOG, ">$file");
+    foreach my $entry (@entries) {
+      chomp($entry);
+      # Thu Oct  3 15:01:32 EDT 2019 cd
+      $entry =~ /^... (...) (..) (..:..:..) ....? (20..) (\S+) (.+)$/;
+      my $month = sprintf("%02d", $MONTHS{$1});
+      my $date = sprintf("%02d", $2);
+      my $time = $3;
+      my $year = $4;
+      my $dir = $5;
+      my $cmd = $6;
+      print LOG "$year-$month-$date $time $dir $cmd\n";
+    }
+    close(LOG);
+  }
 }
