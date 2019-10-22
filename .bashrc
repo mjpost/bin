@@ -15,6 +15,7 @@ fi
 alias p="philog"
 alias pp="philog -pretty"
 alias ppd="philog -pretty -dir"
+alias pr="philog -rerun"
 alias pd="philog -dir"
 alias pe="vi .philog.LOGFILE"
 alias ph="history | philog -history"
