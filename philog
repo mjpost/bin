@@ -7,6 +7,7 @@
 # alias pp="philog -pretty"
 # alias ppd="philog -pretty -dir"
 # alias pd="philog -dir"
+# alias pr="philog -rerun"
 #
 # # edit the command cache
 # alias pe="vi .philog.LOGFILE"
@@ -45,6 +46,8 @@ if ($history) {
   my $cmd =  $cmd[$#cmd-$last];
   $cmd =~ s/^\s*\d+\s*//;
   $cmd =~ s/^[\d\-]+ [\d\:]+\s*//;
+  $cmd =~ s/^#\s*//;   # remove comment
+  print($cmd);
   chomp($cmd);
   &log($cmd);
 }
