@@ -47,7 +47,6 @@ if ($history) {
   $cmd =~ s/^\s*\d+\s*//;
   $cmd =~ s/^[\d\-]+ [\d\:]+\s*//;
   $cmd =~ s/^#\s*//;   # remove comment
-  print($cmd);
   chomp($cmd);
   &log($cmd);
 }
