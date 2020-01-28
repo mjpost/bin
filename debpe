@@ -1,11 +1,1 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-import sys
-
-for line in sys.stdin:
-  line = line.rstrip()
-  if '▁' in line:
-    print(line.replace(' ', '').replace('▁', ' ').strip(), flush=True)
-  else:
-    print(line.replace('@@ ', '').replace('@@', ''), flush=True)
+debpe.py
