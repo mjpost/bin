@@ -20,6 +20,14 @@ alias pd="philog -dir"
 alias pe="vi .philog.LOGFILE"
 alias ph="history | philog -history"
 
+alias weather="wget -qO- http://wttr.in/baltimore"
+
+share() {
+  scp $1 jhu:public_html/tmp
+  ssh jhu chmod 644 public_html/tmp/$1
+  echo http://cs.jhu.edu/~post/tmp/$1
+}
+
 case $TERM in
     xterm*)
         PS1="\[\033]0; \w\007\]${BLUE}\$ ${NONE}"
