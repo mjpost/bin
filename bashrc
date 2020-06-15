@@ -20,7 +20,11 @@ alias pd="philog -dir"
 alias pe="vi .philog.LOGFILE"
 alias ph="history | philog -history"
 
-alias weather="wget -qO- http://wttr.in/baltimore"
+weather() {
+  city="$@"
+  [[ -z $city ]] && city=baltimore
+  curl "http://wttr.in/$city"
+}
 
 share() {
   scp $1 jhu:public_html/tmp
