@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+
+"""
+Truncates a sentence to a set length based on the number of tokens.
+If "-l zh" is passed, Han characters count as tokens.
+"""
+
+import sys
+import regex as re
+
+def main(args):
+    # TODO: should preserve the particular whitespaces
+    for line in sys.stdin:
+        if args.lang == "zh":
+            count = 0
+            for char in line.strip():
+                if re.match(r'\p{Han}', char) or char == " ":
+                    count += 1
+                if count <= args.length:
+                    print(char, end="")
+
+            print()
+        else:
+            tokens = line.strip().split()
+            print(" ".join(tokens[0:args.length]))
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("length", type=int)
+    parser.add_argument("--lang", "-l", default="en")
+    args = parser.parse_args()
+
+    main(args)
