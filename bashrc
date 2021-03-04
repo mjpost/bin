@@ -1,7 +1,8 @@
 # Powerline-shell is a great tool.
 # Install it via pip: "pip3 install powerline-shell".
 # You can then dump the config file with "powerline-shell --generate-config > ~/.powerline-shell.json"
-if [[ $(which powerline-shell > /dev/null) -eq 0 ]]; then
+which powerline-shell > /dev/null 2>&1
+if [[ $? -eq 0 ]]; then
     function _update_ps1() {
         PS1="$(powerline-shell $?)"
     }
