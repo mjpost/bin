@@ -6,7 +6,7 @@ Selects k items uniformly at random from an arbitrary-length stream.
 
 Usage:
 
-    cat file | rand-sample [--seed] [K=10]
+    cat file | rsample [--seed] [K=10]
 
 where `K` is the number of samples desired.
 """
