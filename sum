@@ -1,11 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import re
 import sys
-import locale
 import argparse
-
-locale.setlocale(locale.LC_ALL, 'en_US')
 
 parser = argparse.ArgumentParser(description='Sum numbers in a column of text')
 parser.add_argument('col', nargs='?', type=int, default=-1, help='Which column? (0-indexed)')
@@ -21,8 +18,8 @@ for line in sys.stdin:
     tokens = re.split(r'\s+', line.rstrip())
     total += float(tokens[args.col])
 
-sum = locale.format("%g", total, grouping=args.pretty)
+sum = total
 if args.verbose:
-    print "%s (%d lines)" % (sum, line_count)
+    print("%s (%d lines)" % (sum, line_count))
 else:
-    print sum
+    print(sum)
