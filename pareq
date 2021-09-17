@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+
+"""
+Checks that two or more files have the same number of lines.
+"""
+
+import sys
+from itertools import zip_longest
+
+
+def main(args):
+    try:
+        for lines in zip_longest(*list(map(open, args.files))):
+            if None in lines:
+                if not args.quiet:
+                    print(f"Files are NOT of equal length", file=sys.stderr)
+                sys.exit(1)
+    except FileNotFoundError:
+        if not args.quiet:
+            print(f"Files are NOT of equal length", file=sys.stderr)
+        sys.exit(1)
+
+    if not args.quiet:
+        print(f"Files are of equal length", file=sys.stderr)
+        
+    sys.exit(0)
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("files", nargs="+")
+    parser.add_argument("--quiet", "-q", action="store_true")
+    args = parser.parse_args()
+
+    main(args)
