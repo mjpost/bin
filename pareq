@@ -21,25 +21,25 @@ def smart_open(filepath, mode='rt', encoding='utf-8'):
 
 def main(args):
     try:
-        for lines in zip_longest(*list(map(smart_open, args.files))):
+        for linecount, lines in enumerate(zip_longest(*list(map(smart_open, args.files))), 1):
             if None in lines:
                 if not args.quiet:
-                    print(f"Files are NOT of equal length", file=sys.stderr)
+                    print(f"Failure: files are NOT of equal length", file=sys.stderr)
                 sys.exit(1)
-    except FileNotFoundError:
+    except FileNotFoundError as e:
         if not args.quiet:
-            print(f"Files are NOT of equal length", file=sys.stderr)
+            print(f"Failure: {e}", file=sys.stderr)
         sys.exit(1)
 
     if not args.quiet:
-        print(f"Files are of equal length", file=sys.stderr)
+        print(f"Success: all files have {linecount} lines", file=sys.stderr)
         
     sys.exit(0)
 
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser("Utility to test line-parallelism of two or more files")
     parser.add_argument("files", nargs="+", help="List of file paths (plain text or .gz)")
     parser.add_argument("--quiet", "-q", action="store_true")
     args = parser.parse_args()
