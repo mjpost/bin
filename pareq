@@ -5,12 +5,23 @@ Checks that two or more files have the same number of lines.
 """
 
 import sys
+import gzip
 from itertools import zip_longest
+
+def smart_open(filepath, mode='rt', encoding='utf-8'):
+    """Convenience function for reading compressed or plain text files.
+    :param filepath: The file to read.
+    :param mode: The file mode (read, write).
+    :param encoding: The file encoding.
+    """
+    if filepath.endswith('.gz'):
+        return gzip.open(filepath, mode=mode, encoding=encoding, newline="\n")
+    return open(filepath, mode=mode, encoding=encoding, newline="\n")
 
 
 def main(args):
     try:
-        for lines in zip_longest(*list(map(open, args.files))):
+        for lines in zip_longest(*list(map(smart_open, args.files))):
             if None in lines:
                 if not args.quiet:
                     print(f"Files are NOT of equal length", file=sys.stderr)
@@ -29,7 +40,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("files", nargs="+")
+    parser.add_argument("files", nargs="+", help="List of file paths (plain text or .gz)")
     parser.add_argument("--quiet", "-q", action="store_true")
     args = parser.parse_args()
 
