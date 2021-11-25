@@ -19,7 +19,7 @@ def smart_read(filename: str):
         else:
             return open(filename, mode='rt', encoding='utf-8')
     except FileNotFoundError as e:
-        print("Can't find file '{}'".format(filename))
+        print(f"Fatal: no such file '{filename}'", file=sys.stderr)
         sys.exit(1)
 
 def main(args):
