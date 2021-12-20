@@ -8,7 +8,7 @@ Here I've organized them into some categories.
 
 ## Machine Translation
 
-- zpaste. A version of "paste" that also allows compressed files.
+- `zpaste`. A version of "paste" that also allows compressed files.
 
 - `unpaste`. The opposite of paste: takes a tab-delimited stream on STDIN, and writes the columns to files. e.g., this command
 
