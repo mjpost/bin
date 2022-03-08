@@ -1,5 +1,21 @@
-#!/bin/bash
+#!/usr/bin/env python3
 
-: ${lang=en}
+"""
+Tab-preserving tokenizer built on Sacremoses.
+"""
 
-debpe | $MOSES/scripts/tokenizer/detokenizer.perl -q -l $lang "$@"
+import sys
+import argparse
+
+from sacremoses import MosesDetokenizer
+
+
+parser = argparse.ArgumentParser("Tab-preserving detokenizer.")
+parser.add_argument("--lang", "-l", default="en")
+args = parser.parse_args()
+
+detok = MosesDetokenizer(lang=args.lang)
+
+for line in sys.stdin:
+    fields = [detok.detokenize(field.split()) for field in line.rstrip().split("\t")]
+    print(*fields, sep="\t")
