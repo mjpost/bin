@@ -42,13 +42,13 @@ if __name__ == '__main__':
         line = line.rstrip('\n')
         fields = line.split(args.delimiter, maxsplit=len(fhs)-1)
         for i, field in enumerate(fields):
-            print(field, file=fhs[i], flush=True)
+            print(field, file=fhs[i])
 
         for i in range(len(fields), len(fhs)):
-            print(file=fhs[i], flush=True)
+            print(file=fhs[i])
 
         if args.tee:
-            print(line, flush=True)
+            print(line)
 
     for fh in fhs:
         fh.close()
