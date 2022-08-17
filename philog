@@ -41,7 +41,7 @@ for (my $i = 0; $i < @ARGV; $i++) {
 
 if ($history) {
   my @cmd = <STDIN>;
-  my $last = 1;
+  my $last = $ENV{"SHELL"} eq "/bin/zsh" ? 0 : 1;
   $last = $ARGV[1] if $#ARGV>0 && $ARGV[1] =~ /^\d+$/;
   my $cmd =  $cmd[$#cmd-$last];
   $cmd =~ s/^\s*\d+\s*//;
