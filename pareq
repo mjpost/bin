@@ -19,12 +19,22 @@ def smart_open(filepath, mode='rt', encoding='utf-8'):
     return open(filepath, mode=mode, encoding=encoding, newline="\n")
 
 
+def count_lines(filename):
+    line_count = 0
+    with smart_open(file) as infh:
+        for line in infh:
+            line_count += 1
+    return line_count
+
+
 def main(args):
     try:
         for linecount, lines in enumerate(zip_longest(*list(map(smart_open, args.files))), 1):
             if None in lines:
                 if not args.quiet:
                     print(f"Failure: files are NOT of equal length", file=sys.stderr)
+                    for file in args.files:
+                        print("->", count_lines(file), file)
                 sys.exit(1)
     except FileNotFoundError as e:
         if not args.quiet:
@@ -33,7 +43,7 @@ def main(args):
 
     if not args.quiet:
         print(f"Success: all files have {linecount} lines", file=sys.stderr)
-        
+
     sys.exit(0)
 
 if __name__ == "__main__":
