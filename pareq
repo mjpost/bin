@@ -2,6 +2,28 @@
 
 """
 Checks that two or more files have the same number of lines.
+This is really useful in creating idempotent scripts.
+For example, only run an expensive translation job if its
+needed:
+
+    in=source.txt
+    out=translations.txt
+
+    if ! pareq -q $in $out; then
+        # do the translation here
+        # write to $out
+    fi
+
+It's safe to run this script since the file won't be
+retranslated unless there was some error the first time
+(in which case you want to retranslate anyway).
+
+Usage:
+
+   pareq [-q] FILE1 FILE2 [FILE3...]
+
+When -q is present, it will only exit with success (0) or failure (1).
+Otherwise, it will print details of what was different.
 """
 
 import sys
