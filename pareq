@@ -21,7 +21,7 @@ def smart_open(filepath, mode='rt', encoding='utf-8'):
 
 def count_lines(filename):
     line_count = 0
-    with smart_open(file) as infh:
+    with smart_open(filename) as infh:
         for line in infh:
             line_count += 1
     return line_count
@@ -45,6 +45,7 @@ def main(args):
         print(f"Success: all files have {linecount} lines", file=sys.stderr)
 
     sys.exit(0)
+
 
 if __name__ == "__main__":
     import argparse
