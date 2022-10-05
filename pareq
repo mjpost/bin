@@ -30,6 +30,7 @@ import sys
 import gzip
 from itertools import zip_longest
 
+
 def smart_open(filepath, mode='rt', encoding='utf-8'):
     """Convenience function for reading compressed or plain text files.
     :param filepath: The file to read.
@@ -54,17 +55,17 @@ def main(args):
         for linecount, lines in enumerate(zip_longest(*list(map(smart_open, args.files))), 1):
             if None in lines:
                 if not args.quiet:
-                    print(f"Failure: files are NOT of equal length", file=sys.stderr)
+                    print(f"pareq failure: files are NOT of equal length", file=sys.stderr)
                     for file in args.files:
                         print("->", count_lines(file), file)
                 sys.exit(1)
     except FileNotFoundError as e:
         if not args.quiet:
-            print(f"Failure: {e}", file=sys.stderr)
+            print(f"pareq failure: {e}", file=sys.stderr)
         sys.exit(1)
 
     if not args.quiet:
-        print(f"Success: all files have {linecount} lines", file=sys.stderr)
+        print(f"pareq success: all files have {linecount} lines", file=sys.stderr)
 
     sys.exit(0)
 
