@@ -54,17 +54,17 @@ def main(args):
     try:
         for linecount, lines in enumerate(zip_longest(*list(map(smart_open, args.files))), 1):
             if None in lines:
-                if not args.quiet:
+                if args.verbose:
                     print(f"pareq failure: files are NOT of equal length", file=sys.stderr)
                     for file in args.files:
                         print("->", count_lines(file), file)
                 sys.exit(1)
     except FileNotFoundError as e:
-        if not args.quiet:
+        if args.verbose:
             print(f"pareq failure: {e}", file=sys.stderr)
         sys.exit(1)
 
-    if not args.quiet:
+    if args.verbose:
         print(f"pareq success: all files have {linecount} lines", file=sys.stderr)
 
     sys.exit(0)
@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Utility to test line-parallelism of two or more files")
     parser.add_argument("files", nargs="+", help="List of file paths (plain text or .gz)")
-    parser.add_argument("--quiet", "-q", action="store_true")
+    parser.add_argument("--verbose", "-v", action="store_true")
     args = parser.parse_args()
 
     main(args)
