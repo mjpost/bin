@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+
+"""
+Addresses limitations in cut's field handling.
+"""
+
+import sys
+import gzip
+
+
+def main(args):
+    fields = []
+    for fieldtoken in args.fields.split(","):
+        if "-" in fieldtoken:
+            start, stop = list(map(int(fieldtoken.split("-"))))
+            for num in range(start, stop + 1):
+                fields.append(num)
+        else:
+            fields.append(int(fieldtoken))
+
+    # get the maximum requested field (1-indexed)
+    maxfieldi = max(fields)
+
+    for line in args.infile:
+        # front-pad for 1-indexing
+        columns = [""] + line.rstrip().split(args.delimiter)
+
+        # pad columns to the maximum field length
+        if len(columns) < maxfieldi:
+            columns += [""] * (maxfieldi - len(columns) + 2)
+
+        output = [columns[f] for f in fields]
+        print(*output, sep=args.delimiter)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("infile", nargs="?", type=argparse.FileType("r"), default=sys.stdin)
+    parser.add_argument("--delimiter", "-d", default="\t")
+    parser.add_argument("--fields", "-f", default="*")
+    args = parser.parse_args()
+
+    main(args)
