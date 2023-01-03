@@ -16,7 +16,6 @@ import gzip
 def main(args):
     fields = []
     for fieldtoken in args.fields.split(","):
-        print("TOKEN", fieldtoken)
         if "-" in fieldtoken:
             start, stop = list(map(int(fieldtoken.split("-"))))
             for num in range(start, stop + 1):
