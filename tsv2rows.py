@@ -17,7 +17,6 @@ def smart_open(file, mode='rt', encoding='utf-8'):
 def main(args):
     for lineno, line in enumerate(args.infile, 1):
         fields = line.rstrip().split("\t")
-
         if len(args.labels) > 0 and len(fields) != len(args.labels):
             print(f"Fatal: # of labels ({len(args.labels)}) doesn't match number of fields ({len(fields)})", file=sys.stderr)
             sys.exit(1)
@@ -38,7 +37,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("infile", nargs="?", type=argparse.FileType("r"), default=sys.stdin)
-    parser.add_argument("--labels", nargs="*", help="provide labels for each column")
+    parser.add_argument("--labels", nargs="*", default=[], help="provide labels for each column")
     args = parser.parse_args()
 
     main(args)

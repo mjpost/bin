@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 
 import sys
+import argparse
 
-for line in sys.stdin:
-    print(line.rstrip().lower())
+parser = argparse.ArgumentParser()
+parser.add_argument("input", nargs="?", default=None)
+args = parser.parse_args()
+
+if args.input:
+    print(args.input.rstrip().lower())
+else:
+    for line in sys.stdin:
+        print(line.rstrip().lower())

@@ -2,6 +2,11 @@
 
 """
 Addresses limitations in cut's field handling.
+
+* Allows redundant output of columns
+* Columns can be output in any order
+* Supports intermingled ranges (x-y) and lone columns (x).
+* Pads input stream to requested column
 """
 
 import sys
@@ -11,6 +16,7 @@ import gzip
 def main(args):
     fields = []
     for fieldtoken in args.fields.split(","):
+        print("TOKEN", fieldtoken)
         if "-" in fieldtoken:
             start, stop = list(map(int(fieldtoken.split("-"))))
             for num in range(start, stop + 1):
@@ -39,7 +45,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("infile", nargs="?", type=argparse.FileType("r"), default=sys.stdin)
     parser.add_argument("--delimiter", "-d", default="\t")
-    parser.add_argument("--fields", "-f", default="*")
+    parser.add_argument("--fields", "-f", default="1")
     args = parser.parse_args()
 
     main(args)
