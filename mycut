@@ -7,7 +7,11 @@ Addresses limitations in cut's field handling.
 * Columns can be output in any order
 * Supports intermingled ranges (x-y) and lone columns (x).
 * Pads input stream to requested column
+<<<<<<< Updated upstream
 * Supports open-ended ranges at the start (-y) or end (x-)
+=======
+* Supports negative column indexing
+>>>>>>> Stashed changes
 """
 
 import sys
@@ -18,7 +22,8 @@ def main(args):
     fields = []
     maxfieldi = 0
     for fieldtoken in args.fields.split(","):
-        if "-" in fieldtoken:
+        if "-" in fieldtoken[:1]:
+            # A range (check from 1st char to permit negative indexing)
             start, stop = fieldtoken.split("-")
 
             assert start != "" or stop != "", f"invalid range {fieldtoken}: only one end can be open-ended"
@@ -41,7 +46,6 @@ def main(args):
         # pad columns to the maximum field length
         if maxfieldi >= len(columns):
             columns += [""] * (maxfieldi - len(columns) + 1)
-            print("EXTENDING", maxfieldi, len(columns))
 
         output = []
         for field in fields:
