@@ -7,13 +7,12 @@ Addresses limitations in cut's field handling.
 * Columns can be output in any order
 * Supports intermingled ranges (x-y) and lone columns (x).
 * Pads input stream to requested column
-<<<<<<< Updated upstream
-* Supports open-ended ranges at the start (-y) or end (x-)
-=======
+* Supports open-ended ranges at the end (x-)
 * Supports negative column indexing
->>>>>>> Stashed changes
+* Use -w for whitespace splitting
 """
 
+import re
 import sys
 import gzip
 
@@ -22,7 +21,7 @@ def main(args):
     fields = []
     maxfieldi = 0
     for fieldtoken in args.fields.split(","):
-        if "-" in fieldtoken[:1]:
+        if "-" in fieldtoken[1:]:
             # A range (check from 1st char to permit negative indexing)
             start, stop = fieldtoken.split("-")
 
@@ -40,8 +39,11 @@ def main(args):
             maxfieldi = max(maxfieldi, fields[-1])
 
     for line in args.infile:
+        if args.whitespace:
+            line = line.trim()
+
         # front-pad for 1-indexing
-        columns = [""] + line.rstrip().split(args.delimiter)
+        columns = [""] + re.split(args.delimiter, line.rstrip())
 
         # pad columns to the maximum field length
         if maxfieldi >= len(columns):
@@ -67,7 +69,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("infile", nargs="?", type=argparse.FileType("r"), default=sys.stdin)
     parser.add_argument("--delimiter", "-d", default="\t")
+    parser.add_argument("--whitespace", "-w", action="store_true", help="Trim line and split on whitespace")
     parser.add_argument("--fields", "-f", default="1")
     args = parser.parse_args()
+
+    if args.whitespace:
+        args.delimiter = r'\s+'
 
     main(args)
