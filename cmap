@@ -9,10 +9,13 @@ Usage:
 Original author: Elijah Rippeth (@erip)
 """
 
-from io import StringIO
-
 import subprocess
+
+from signal import signal, SIGPIPE, SIG_DFL
 from argparse import ArgumentParser, FileType, REMAINDER
+
+# Silence broken pipes when downstream stops reading; e.g., piping to `head`
+signal(SIGPIPE, SIG_DFL)
 
 def setup_argparse():
     parser = ArgumentParser()
@@ -28,14 +31,18 @@ if __name__ == "__main__":
     if args.fields:
         rel_fields = [int(e)-1 for e in args.fields.split(",")]
 
+    procs = []
     with args.input as fin, args.output as fout:
         for line in map(str.strip, fin):
             columns = line.split(args.delimiter)
             if args.fields:
                 columns = [columns[f] for f in rel_fields]
+            if len(procs) == 0:
+                procs = [subprocess.Popen(args.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=0) for _ in columns]
             output = []
-            for col in columns:
-                o = subprocess.Popen(args.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=0)
-                stdout = o.communicate(input=(col+"\n").encode())[0]
+            for i, col in enumerate(columns):
+                procs[i].stdin.write((col+"\n").encode())
+                procs[i].stdin.flush()
+                stdout = procs[i].stdout.readline()
                 output.append(stdout.decode().strip())
             print(args.delimiter.join(output), file=fout)
