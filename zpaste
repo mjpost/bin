@@ -27,7 +27,7 @@ def main(args):
     for i, lines in enumerate(zip_func(*args.files), 1):
         if args.head != 0 and i > args.head:
             break
-        lines = list(map(lambda x: x.rstrip(), lines))
+        lines = list(map(lambda x: x.rstrip() if x else "", lines))
         if args.line_numbers:
             lines.insert(0, str(i))
         print(args.delimiter.join(lines))
