@@ -41,10 +41,11 @@ def main(args):
 
     pool = ReservoirSampler(size=args.num_samples)
 
-    for i, line in enumerate(sys.stdin, 1):
-        pool.add(line.rstrip())
+    for i, line in enumerate(map(str.rstrip, sys.stdin), 1):
+        pool.add(line)
 
-    print(*pool.samples, sep="\n")
+    for sample in pool.samples:
+        print(sample)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
