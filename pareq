@@ -2,11 +2,34 @@
 
 """
 Checks that two or more files have the same number of lines.
+This is really useful in creating idempotent scripts.
+For example, only run an expensive translation job if its
+needed:
+
+    in=source.txt
+    out=translations.txt
+
+    if ! pareq -q $in $out; then
+        # do the translation here
+        # write to $out
+    fi
+
+It's safe to run this script since the file won't be
+retranslated unless there was some error the first time
+(in which case you want to retranslate anyway).
+
+Usage:
+
+   pareq [-q] FILE1 FILE2 [FILE3...]
+
+When -q is present, it will only exit with success (0) or failure (1).
+Otherwise, it will print details of what was different.
 """
 
 import sys
 import gzip
 from itertools import zip_longest
+
 
 def smart_open(filepath, mode='rt', encoding='utf-8'):
     """Convenience function for reading compressed or plain text files.
@@ -19,29 +42,40 @@ def smart_open(filepath, mode='rt', encoding='utf-8'):
     return open(filepath, mode=mode, encoding=encoding, newline="\n")
 
 
+def count_lines(filename):
+    line_count = 0
+    with smart_open(filename) as infh:
+        for line in infh:
+            line_count += 1
+    return line_count
+
+
 def main(args):
     try:
         for linecount, lines in enumerate(zip_longest(*list(map(smart_open, args.files))), 1):
             if None in lines:
-                if not args.quiet:
-                    print(f"Failure: files are NOT of equal length", file=sys.stderr)
+                if args.verbose:
+                    print(f"pareq failure: files are NOT of equal length", file=sys.stderr)
+                    for file in args.files:
+                        print("->", count_lines(file), file)
                 sys.exit(1)
     except FileNotFoundError as e:
-        if not args.quiet:
-            print(f"Failure: {e}", file=sys.stderr)
+        if args.verbose:
+            print(f"pareq failure: {e}", file=sys.stderr)
         sys.exit(1)
 
-    if not args.quiet:
-        print(f"Success: all files have {linecount} lines", file=sys.stderr)
-        
+    if args.verbose:
+        print(f"pareq success: all files have {linecount} lines", file=sys.stderr)
+
     sys.exit(0)
+
 
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser("Utility to test line-parallelism of two or more files")
     parser.add_argument("files", nargs="+", help="List of file paths (plain text or .gz)")
-    parser.add_argument("--quiet", "-q", action="store_true")
+    parser.add_argument("--verbose", "-v", action="store_true")
     args = parser.parse_args()
 
     main(args)

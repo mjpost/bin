@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+
+"""
+Addresses limitations in cut's field handling.
+
+* Allows redundant output of columns
+* Columns can be output in any order
+* Supports intermingled ranges (x-y) and lone columns (x).
+* Pads input stream to requested column
+* Supports open-ended ranges at the end (x-)
+* Supports negative column indexing
+* Use -w for whitespace splitting
+"""
+
+import re
+import sys
+import gzip
+
+
+def main(args):
+    fields = []
+    maxfieldi = 0
+    for fieldtoken in args.fields.split(","):
+        if "-" in fieldtoken[1:]:
+            # A range (check from 1st char to permit negative indexing)
+            start, stop = fieldtoken.split("-")
+
+            assert start != "" or stop != "", f"invalid range {fieldtoken}: only one end can be open-ended"
+            if start and stop:
+                assert int(stop) >= int(start), f"invalid range {fieldtoken}: must be non-decreasing"
+
+            start = int(start) if start else 1
+            stop = int(stop) if stop else -1
+
+            fields.append((start, stop))
+            maxfieldi = max(maxfieldi, start, stop)
+        else:
+            fields.append(int(fieldtoken))
+            maxfieldi = max(maxfieldi, fields[-1])
+
+    for line in args.infile:
+        if args.whitespace:
+            line = line.trim()
+
+        # front-pad for 1-indexing
+        columns = [""] + re.split(args.delimiter, line.rstrip())
+
+        # pad columns to the maximum field length
+        if maxfieldi >= len(columns):
+            columns += [""] * (maxfieldi - len(columns) + 1)
+
+        output = []
+        for field in fields:
+            if type(field) is int:
+                output.append(columns[field])
+            elif type(field) is tuple:
+                start, stop = field
+                if stop == -1:
+                    stop = len(columns) - 1
+
+                output += [columns[f] for f in range(start, stop + 1)]
+
+        print(*output, sep=args.delimiter)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("infile", nargs="?", type=argparse.FileType("r"), default=sys.stdin)
+    parser.add_argument("--delimiter", "-d", default="\t")
+    parser.add_argument("--whitespace", "-w", action="store_true", help="Trim line and split on whitespace")
+    parser.add_argument("--fields", "-f", default="1")
+    args = parser.parse_args()
+
+    if args.whitespace:
+        args.delimiter = r'\s+'
+
+    main(args)

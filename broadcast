@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+
+"""Broadcasts the text argument string across every line of the input file.
+
+
+Usage:
+
+    cat in.txt | broadcast "This is a test"
+
+Will output every line of in.txt, with the string "This is a test" as column one, tab-separated.
+
+You can specify the index of the output field using the -i argument. The default is -1.
+"""
+
+import sys
+
+
+def main(args):
+    message = " ".join(args.message)
+
+    for line in args.infile:
+        fields = line.rstrip().split("\t")
+        if args.index >= 0 and args.index < len(fields):
+            fields.insert(args.index, message)
+        else:
+            fields.append(message)
+
+        print(*fields, sep=args.separator)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--index", "-i", type=int, default=-1, help="which field to broadcast the message to (default: %(default)s)")
+    parser.add_argument("--infile", type=argparse.FileType("r"), default=sys.stdin)
+    parser.add_argument("--separator", "-t", default="\t")
+    parser.add_argument("message", nargs="+")
+    args = parser.parse_args()
+
+    main(args)
