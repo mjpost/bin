@@ -5,6 +5,8 @@
 
 Usage:
     paste <(echo "1+1") <(echo "2+2") <(echo "3+3") | cmap bc
+
+Original author: Elijah Rippeth (@erip)
 """
 
 from io import StringIO
