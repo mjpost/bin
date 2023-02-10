@@ -40,7 +40,7 @@ def main(args):
 
     for line in args.infile:
         if args.whitespace:
-            line = line.trim()
+            line = line.strip()
 
         # front-pad for 1-indexing
         columns = [""] + re.split(args.delimiter, line.rstrip())
