@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+
+"""
+[c]olumn [map]per --- applies a subcommand to each column of a delimited stream.
+
+Usage:
+    paste <(echo "1+1") <(echo "2+2") <(echo "3+3") | cmap bc
+    
+where `K` is the number of samples desired.
+"""
+
+from io import StringIO
+
+import subprocess
+from argparse import ArgumentParser, FileType, REMAINDER
+
+def setup_argparse():
+    parser = ArgumentParser()
+    parser.add_argument("-f", "--fields", default=None, required=False, help="The comma-delimited field numbers (1-indexed) to which to apply the subcommand")
+    parser.add_argument("-d", "--delimiter", default="\t", help="The delimiter on which columns are read and written")
+    parser.add_argument("-i", "--input", type=FileType("r"), default="-", help="The input stream")
+    parser.add_argument("-o", "--output", type=FileType("w"), default="-", help="The output stream")
+    parser.add_argument("command", nargs=REMAINDER)
+    return parser
+
+if __name__ == "__main__":
+    args = setup_argparse().parse_args()
+    if args.fields:
+        rel_fields = [int(e)-1 for e in args.fields.split(",")]
+
+    with args.input as fin, args.output as fout:
+        for line in map(str.strip, fin):
+            columns = line.split(args.delimiter)
+            if args.fields:
+                columns = [columns[f] for f in rel_fields]
+            output = []
+            for col in columns:
+                o = subprocess.Popen(args.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=0)
+                stdout = o.communicate(input=(col+"\n").encode())[0]
+                output.append(stdout.decode().strip())
+            print(args.delimiter.join(output), file=fout)
