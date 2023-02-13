@@ -23,7 +23,7 @@ def setup_argparse():
     parser.add_argument("-d", "--delimiter", default="\t", help="The delimiter on which columns are read and written")
     parser.add_argument("-i", "--input", type=FileType("r"), default="-", help="The input stream")
     parser.add_argument("-o", "--output", type=FileType("w"), default="-", help="The output stream")
-    parser.add_argument("command", nargs=REMAINDER, help="The subcommand to be applied to all columns. Must necessarily produce one line of stdout for each line consumed over stdin without buffering.)
+    parser.add_argument("command", nargs=REMAINDER, help="The subcommand to be applied to all columns. Must necessarily produce one line of stdout for each line consumed over stdin without buffering.")
     return parser
 
 if __name__ == "__main__":
