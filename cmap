@@ -9,10 +9,12 @@ Usage:
 Original author: Elijah Rippeth (@erip)
 """
 
-from io import StringIO
-
 import subprocess
+from signal import signal, SIGPIPE, SIG_DFL
 from argparse import ArgumentParser, FileType, REMAINDER
+
+# Silence broken pipes when downstream stops reading; e.g., piping to `head`
+signal(SIGPIPE, SIG_DFL)
 
 def setup_argparse():
     parser = ArgumentParser()
