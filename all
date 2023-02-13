@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-all --- filters out rows which don't meet a specified predicate
+all --- filters out rows whose columns don't meet a specified predicate
 
 Usage:
     $ paste <(seq -s' ' 0 5) <(seq -s' ' 0 3) | all 'len(col.split()) > 4'
