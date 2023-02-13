@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-[c]olumn [map]per --- applies a subcommand to each column of a delimited stream. 
+[c]olumn [map]per --- applies a subcommand to each column of a delimited stream. The provided subcommand must necessarily provide one line of stdout for each line consumed over stdin without buffering.
 
 Usage:
     paste <(echo "1+1") <(echo "2+2") <(echo "3+3") | cmap bc
