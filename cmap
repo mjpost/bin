@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
 """
-[c]olumn [map]per --- applies a subcommand to each column of a delimited stream.
+[c]olumn [map]per --- applies a subcommand to each column of a delimited stream. 
 
 Usage:
     paste <(echo "1+1") <(echo "2+2") <(echo "3+3") | cmap bc
 
 Original author: Elijah Rippeth (@erip)
 """
-#!/usr/bin/env python3
 
 import subprocess
 
