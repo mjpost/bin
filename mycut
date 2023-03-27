@@ -63,8 +63,16 @@ def main(args):
         print(*output, sep=args.delimiter)
 
 
+def handle_sigpipe(signum, frame):
+    sys.exit(0)
+
+
 if __name__ == "__main__":
     import argparse
+    import signal
+
+    # Don't complain when downstream CLI tools quit
+    signal.signal(signal.SIGPIPE, handle_sigpipe)
 
     parser = argparse.ArgumentParser()
     parser.add_argument("infile", nargs="?", type=argparse.FileType("r"), default=sys.stdin)
