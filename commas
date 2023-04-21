@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+
+# Read a number from STDIN, and insert underscores into it.
+
+# Author: Matt Post (@mjpost)
+
+import sys
+
+def main(args):
+    for line in sys.stdin:
+        num = line.strip()
+        # Insert commas into the number.
+        num = insert_commas(num, args.separator)
+
+        # Print the number.
+        print(num)
+
+def insert_commas(prefix, separator):
+    # Insert commas into the number.
+    # First, reverse the number.
+    prefix, suffix = prefix.split('.')
+
+    prefix = prefix[::-1]
+    # Next, insert commas every three characters.
+    prefix = separator.join(prefix[i:i+3] for i in range(0, len(prefix), 3))
+    # Finally, reverse the number again.
+    prefix = prefix[::-1]
+    # Return the number.
+
+    return ".".join([prefix, suffix])
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='Insert commas into a number.')
+    parser.add_argument('--separator', '-s', default='_', help='Separator to use (default: "_")')
+    args = parser.parse_args()
+
+    main(args)
