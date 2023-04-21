@@ -18,7 +18,11 @@ def main(args):
 def insert_commas(prefix, separator):
     # Insert commas into the number.
     # First, reverse the number.
-    prefix, suffix = prefix.split('.')
+    if "." in prefix:
+      prefix, suffix = prefix.split('.')
+      suffix = f".{suffix}"
+    else:
+      suffix = ""
 
     prefix = prefix[::-1]
     # Next, insert commas every three characters.
@@ -27,7 +31,7 @@ def insert_commas(prefix, separator):
     prefix = prefix[::-1]
     # Return the number.
 
-    return ".".join([prefix, suffix])
+    return prefix + suffix
 
 if __name__ == '__main__':
     import argparse
