@@ -10,6 +10,7 @@ Addresses limitations in cut's field handling.
 * Supports open-ended ranges at the end (x-)
 * Supports negative column indexing
 * Use -w for whitespace splitting
+* Delimiter can be multi-char and even a regex
 """
 
 import re
