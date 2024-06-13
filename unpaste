@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # *-* encoding: utf-8 *-*
 
-""" 
+"""
 Takes a tab-delimited stream on STDIN and writes the columns in turn to the files specified as
 arguments (i.e., the opposite of UNIX `paste`). If there are more fields than files, the last file
 will get all remaining fields. If there are more files than fields, files beyond the last field will
@@ -14,6 +14,7 @@ Author: Matt Post <post@cs.jhu.edu>
 
 import sys
 import argparse
+import multiprocessing
 
 if __name__ == '__main__':
 
@@ -26,17 +27,31 @@ if __name__ == '__main__':
                         help='Delimiter to use')
     parser.add_argument('files', nargs='+',
                         help='File(s) to write to')
+    parser.add_argument("--blocksize", "-b", type=int, default=2*10**8,
+                        help="Blocksize for pgzip")
+    parser.add_argument("--num-threads", "-j", type=int, default=multiprocessing.cpu_count(),
+                        help="Number of threads for pgzip. Default: %(default)s")
     args = parser.parse_args()
 
-    def _writeto(filename, append=False):
+    def _writeto(filename, append=False, threads_per_file=1):
         mode = 'at' if append else 'wt'
         if filename.endswith('.gz'):
-            import gzip
-            return gzip.open(filename, mode)
+            try:
+                import pgzip
+                print(f"Using pgzip with {threads_per_file} threads.", file=sys.stderr)
+                return pgzip.open(filename, mode, thread=threads_per_file, blocksize=args.blocksize)
+
+            except ModuleNotFoundError:
+                print("pgzip not found, using much slower gzip instead.", file=sys.stderr)
+                print("We recommend you install it: 'pip install pgzip'", file=sys.stderr)
+
+                import gzip
+                return gzip.open(filename, mode)
         else:
             return open(filename, mode)
 
-    fhs = list(map(lambda x: _writeto(x, args.append), args.files))
+    threads_per_file = args.num_threads // len(args.files)
+    fhs = list(map(lambda x: _writeto(x, args.append, threads_per_file), args.files))
 
     for line in sys.stdin:
         line = line.rstrip('\n')
