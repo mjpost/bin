@@ -6,7 +6,6 @@ Prints the absolute path of all arguments.
 Author: Matt Post <post@cs.jhu.edu>
 """
 
-
 import os
 import argparse
 
