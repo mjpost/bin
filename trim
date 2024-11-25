@@ -4,6 +4,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--collapse", "-c", action="store_true", help="Also collapse multiple whitespaces into one")
+parser.add_argument("--punc", "-p", action="store_true", help="Remove punctuation")
 args = parser.parse_args()
 
 import sys
@@ -12,5 +13,8 @@ for line in sys.stdin:
 
     if args.collapse:
         line = " ".join(line.split())
+
+    if args.punc:
+        line = "".join(c for c in line if c.isalnum() or c.isspace())
 
     print(line, flush=True)
