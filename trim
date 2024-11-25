@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--collapse", "-c", action="store_true", help="Also collapse multiple whitespaces into one")
+args = parser.parse_args()
+
 import sys
 for line in sys.stdin:
-    print(line.strip(), flush=True)
+    line = line.strip()
+
+    if args.collapse:
+        line = " ".join(line.split())
+
+    print(line, flush=True)
