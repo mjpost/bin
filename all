@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+
+"""
+all --- filters out rows whose columns don't meet a specified predicate
+
+Usage:
+    $ paste <(seq -s' ' 0 5) <(seq -s' ' 0 3) | all 'len(col.split()) > 4'
+    $
+    $ paste <(seq -s' ' 0 5) <(seq -s' ' 0 3) | all 'len(col.split()) >= 4'
+    $ 0 1 2 3 4 5     0 1 2 3
+    $ echo -e "hello\t" | all
+    $
+
+Original author: Elijah Rippeth (@erip)
+"""
+
+from argparse import ArgumentParser, FileType
+
+def nonempty(col):
+    return col != ""
+
+def construct_pred(pred_str):
+    if pred_str is None:
+        return nonempty
+    s = "lambda col: " + pred_str
+    return eval(s)
+
+def setup_argparse():
+    parser = ArgumentParser()
+    parser.add_argument("-i", "--input", type=FileType("r"), default="-")
+    parser.add_argument("-o", "--output", type=FileType("w"), default="-")
+    parser.add_argument("-d", "--delimiter", type=str, default="\t")
+    parser.add_argument("pred", nargs="?", help="A python predicate (lambda body) which defines whether a column meets the 'keep' criteria; the column name is 'col'; default is keep only rows with non-empty columns")
+    return parser
+
+if __name__ == "__main__":
+    args = setup_argparse().parse_args()
+
+    pred = construct_pred(args.pred)
+
+    with args.input as fin, args.output as fout:
+        for line in map(lambda s: s.rstrip("\r\n"), fin):
+            parts = line.split(args.delimiter)
+            if all(map(pred, parts)):
+                print(line, file=fout)
